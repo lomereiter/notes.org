@@ -1,0 +1,157 @@
+* Building blocks
+   
+** Object detection
+    
+   https://medium.com/@jonathan_hui/object-detection-speed-and-accuracy-comparison-faster-r-cnn-r-fcn-ssd-and-yolo-5425656ae359
+   
+   mAP = mean Average Precision
+   https://en.wikipedia.org/wiki/Evaluation_measures_(information_retrieval)#Mean_average_precision
+
+*** YOLO (you only look once):
+
+   https://pjreddie.com/darknet/yolo/
+   https://pjreddie.com/darknet/yolov2/ 
+   
+*** Non-maximum suppression
+   https://www.pyimagesearch.com/2014/11/17/non-maximum-suppression-object-detection-python/
+   
+*** OHEM (online hard example mining)
+    https://arxiv.org/pdf/1604.03540.pdf
+** STN (Spatial Transformer Network)
+   https://towardsdatascience.com/convnets-series-spatial-transformer-networks-cff47565ae81
+    
+   > In layman’s terms, STN is a mechanism that rotates or scales an input image or a feature map 
+   > in order to focus on the target object and to remove rotational variance
+    
+   - can be used for detecting non-rectangular regions
+   - single spatial transformation over the entire input
+    
+*** LocNet
+    https://github.com/tensorflow/models/tree/master/research/transformer
+   
+
+*** Fire module (from SqueezeNet paper)
+    https://arxiv.org/pdf/1602.07360.pdf
+    squeeze layer (only 1x1 filters) -> expand layer (mix of 1x1 and 3x3 convolution filters)
+    
+*** CTC (Connectionist Temporal Classification)
+    - ctc_greedy_decoder = ctc_beam_search_decoder(top_paths=1, beam_width=1, ...)
+    - https://distill.pub/2017/ctc/
+    - https://towardsdatascience.com/intuitively-understanding-connectionist-temporal-classification-3797e43a86c
+    - 
+*** Residual connections (ResNet)
+    https://arxiv.org/pdf/1512.03385.pdf (2015, Microsoft)
+
+    
+* Blogs
+http://www.computervisionblog.com/  - Tomasz Malisiewicz http://people.csail.mit.edu/tomasz/
+    
+* Face detection
+
+** MTCNN (used by FaceNet) - 2016
+   Multi-Task Cascaded Neural Networks
+   https://kpzhang93.github.io/MTCNN_face_detection_alignment/
+   
+   3-stage approach:
+   - shallow CNN to produce candidate windows
+     P-net, Proposal Network + non-maximum suppression
+   - refine the windows by rejecting non-face windows using a more complex CNN
+     R-net, Refine Network + NMS
+   - a more powerful CNN to refine the result and output 5 facial landmark positions
+    
+** HOG (histogram of oriented gradients) + SVM (used by dlib)
+   https://www.learnopencv.com/histogram-of-oriented-gradients/
+   
+   comparison with (slow, usable only with GPU) CNN dlib detector:
+   https://towardsdatascience.com/cnn-based-face-detector-from-dlib-c3696195e01c
+   
+   only works well with near-frontal images
+   
+** faced
+ https://towardsdatascience.com/faced-cpu-real-time-face-detection-using-deep-learning-1488681c1602 
+ 288x288x3 -> 9x9x5 (probability that the cell contains a center of a face, x, y, width, height)
+ 7M parameters
+ auxilliary network: cropped main image -> (x, y, width, height) // more accurate
+ 
+ 5 fps on i5 CPU
+ https://github.com/iitzco/faced (MIT license)
+ 
+* Face recognition
+  
+** Old stuff (sources of ideas)
+*** Zeiler&Fergus (aka ZFNet)
+*** AlexNet
+
+** FaceNet
+
+  original paper: https://arxiv.org/abs/1503.03832 (2015, Google)
+  - 128D embedding (unit sphere)
+  - learned on triplets (2 matching + 1 non-matching), no alignment other than scale/translation
+  - training: mini-batches of 1800 photos, 40+ images / identity
+  - 99.63% accuracy is achieved on LFW with the aid of a proprietary face detector
+  - otherwise, 98.87% is claimed (NN1, the largest network)
+  - trained on 200M+ images / 8M identities
+  
+  Oxford Visual Geometry Group paper, also 2015: http://www.robots.ox.ac.uk/~vgg/publications/2015/Parkhi15/parkhi15.pdf
+  - trained on 2.6M images / 2.6K identities - celebrities and public figures (IMDB actors)
+  - dataset created with minimal manual effort (14 days)
+  - similar triplet-based approach
+  - 98.95% accuracy on LFW
+
+  code: https://github.com/davidsandberg/facenet
+  - 20180402-114759 - trained on VGGFace2, 512D embedding, 99.65% accuracy on LFW, Inception ResNet v1
+  - architecture: http://arxiv.org/abs/1602.07261
+   
+** CosFace (uses Large Margin Cosine Loss)
+  https://arxiv.org/pdf/1801.09414.pdf
+  99.73% on LFW
+  
+** ArcFace
+   https://arxiv.org/pdf/1801.07698.pdf
+  
+** MobileFaceNet (ArcFace loss)
+   https://arxiv.org/abs/1804.07573
+   
+** Metrics
+  https://elib.dlr.de/116408/1/WACV2018.pdf
+  
+** Datasets
+*** LFW (Labeled Faces in the Wild)
+*** YTF (Youtube Faces DB)
+*** VGGFace2: 3.31M images / 9.1K identities    
+
+* Licence plate recognition
+  
+** Commercial
+
+ - Sighthound
+ - OpenALPR (also Cloud API)
+
+** Datasets
+   
+*** CCPD (Chinese City Parking Dataset) 
+    https://github.com/detectRecog/CCPD 
+*** AOLP (Taiwan)
+    http://aolpr.ntust.edu.tw/lab/
+*** SSIG (Brazil)
+    http://www.ssig.dcc.ufmg.br/ssig-segplate-database/
+*** Cars Dataset 
+    ~16k images, ~200 classes (make/model/year)
+    https://ai.stanford.edu/~jkrause/cars/car_dataset.html
+  
+** Papers
+   
+*** LPRNet: License Plate Recognition via Deep Neural Networks, 2018
+    - https://arxiv.org/pdf/1806.10447.pdf
+    - optional Spatial Transformer Layer  (LocNet)
+    - https://github.com/opencv/openvino_training_extensions/tree/develop/tensorflow_toolkit/lpr
+    - http://docs.openvinotoolkit.org/latest/_vehicle_license_plate_detection_barrier_0106_description_vehicle_license_plate_detection_barrier_0106.html
+   
+*** License Plate Detection and Recognition in Unconstrained Scenarios, 2018
+    - http://sergiomsilva.com/pubs/alpr-unconstrained/
+    - approach: Vehicle detection -> LP detection -> OCR
+    - WPOD-NET = Warped Planar Object Detection Network
+    - a mix of ideas from YOLO / SSD and STN
+    - comparison against OpenALPR / Sighthound is provided
+    - 5 FPS on NVIDIA Titan X + Intel Xeon + 12GB RAM
+
